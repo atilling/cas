@@ -33,12 +33,14 @@ public class FinishLogoutAction extends AbstractLogoutAction {
 
     @Override
     protected Event doInternalExecute(final RequestContext context) {
+        val request = WebUtils.getHttpServletRequestFromExternalWebflowContext(context);
         val logoutRedirect = WebUtils.getLogoutRedirectUrl(context, String.class);
         if (StringUtils.isNotBlank(logoutRedirect)) {
             return new EventFactorySupport().event(this, CasWebflowConstants.TRANSITION_ID_REDIRECT);
         }
         val logoutPostUrl = WebUtils.getLogoutPostUrl(context);
         val logoutPostData = WebUtils.getLogoutPostData(context);
+        context.getFlowScope().put("httpRequestSecure", request.isSecure());
         if (StringUtils.isNotBlank(logoutPostUrl) && logoutPostData != null) {
             val flowScope = context.getFlowScope();
             flowScope.put("originalUrl", logoutPostUrl);
